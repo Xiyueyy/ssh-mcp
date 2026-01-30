@@ -1,5 +1,7 @@
 import { parseArgs } from "node:util";
 import { SSHConfig, SshConnectionConfigMap, ParsedArgs } from "../models/types.js";
+import fs from "fs";
+import path from "path";
 
 /**
  * Command line argument parser class
@@ -12,6 +14,7 @@ export class CommandLineParser {
     const { values, positionals } = parseArgs({
       args: process.argv.slice(2),
       options: {
+        "config-file": { type: "string" },
         ssh: { type: "string", multiple: true },
         // Compatible with single connection legacy parameters
         host: { type: "string", short: "h" },
@@ -28,60 +31,80 @@ export class CommandLineParser {
       allowPositionals: true,
     });
 
-    const sshParams: string[] = Array.isArray(values.ssh)
-      ? values.ssh
-      : values.ssh
-      ? [values.ssh]
-      : [];
-
     const configMap: SshConnectionConfigMap = {};
 
-    // Parse multiple --ssh parameters
-    for (const sshStr of sshParams) {
-      // Parse format: name=dev,host=1.2.3.4,port=22,user=alice,password=xxx
-      const parts = sshStr.split(",");
-      const conf: any = {};
-      for (const part of parts) {
-        const [k, v] = part.split("=");
-        if (k && v) {
-          conf[k.trim()] = v.trim();
+    // Priority 1: Load from config file if specified
+    if (values["config-file"]) {
+      const configFilePath = path.resolve(values["config-file"]);
+      if (!fs.existsSync(configFilePath)) {
+        throw new Error(`Config file not found: ${configFilePath}`);
+      }
+      try {
+        const configContent = fs.readFileSync(configFilePath, "utf-8");
+        const fileConfig = JSON.parse(configContent);
+        
+        // Support both array format and object format
+        if (Array.isArray(fileConfig)) {
+          // Array format: [{name: "dev", host: "...", ...}, ...]
+          for (const config of fileConfig) {
+            if (!config.name || !config.host || !config.port || !config.username) {
+              throw new Error("Each config in array must include name, host, port, username");
+            }
+            configMap[config.name] = this.normalizeConfig(config);
+          }
+        } else if (typeof fileConfig === "object" && fileConfig !== null) {
+          // Object format: {"dev": {host: "...", ...}, "prod": {...}}
+          for (const [name, config] of Object.entries(fileConfig)) {
+            const normalizedConfig = this.normalizeConfig(config as any);
+            normalizedConfig.name = name;
+            configMap[name] = normalizedConfig;
+          }
+        } else {
+          throw new Error("Config file must contain an array or object of SSH configurations");
         }
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          throw new Error(`Invalid JSON in config file: ${(err as Error).message}`);
+        }
+        throw err;
       }
-      // Must have name, host, port, user
-      if (!conf.name || !conf.host || !conf.port || !conf.user) {
-        throw new Error("Each --ssh must include name, host, port, user");
-      }
-      const port = parseInt(conf.port, 10);
-      if (isNaN(port)) {
-        throw new Error(
-          `Port for connection ${conf.name} must be a valid number`
-        );
-      }
-      configMap[conf.name] = {
-        name: conf.name,
-        host: conf.host,
-        port,
-        username: conf.user,
-        password: conf.password,
-        privateKey: conf.privateKey,
-        passphrase: conf.passphrase,
-        socksProxy: conf.socksProxy,
-        commandWhitelist: conf.whitelist
-          ? conf.whitelist
-              .split("|")
-              .map((s: string) => s.trim())
-              .filter(Boolean)
-          : undefined,
-        commandBlacklist: conf.blacklist
-          ? conf.blacklist
-              .split("|")
-              .map((s: string) => s.trim())
-              .filter(Boolean)
-          : undefined,
-      };
     }
 
-    // Compatible with single connection legacy parameters
+    // Priority 2: Parse --ssh parameters (only if no config file was loaded)
+    if (Object.keys(configMap).length === 0) {
+      const sshParams: string[] = Array.isArray(values.ssh)
+        ? values.ssh
+        : values.ssh
+        ? [values.ssh]
+        : [];
+
+      for (const sshStr of sshParams) {
+        let conf: SSHConfig;
+        
+        // Try to parse as JSON first
+        if (sshStr.trim().startsWith("{")) {
+          try {
+            const jsonConfig = JSON.parse(sshStr);
+            conf = this.normalizeConfig(jsonConfig);
+            if (!conf.name) {
+              throw new Error("JSON config must include 'name' field");
+            }
+          } catch (err) {
+            throw new Error(`Invalid JSON format in --ssh parameter: ${(err as Error).message}`);
+          }
+        } else {
+          // Fallback to legacy comma-separated format for backward compatibility
+          conf = this.parseLegacySshFormat(sshStr);
+        }
+        
+        if (!conf.name || !conf.host || !conf.port || !conf.username) {
+          throw new Error("Each --ssh must include name, host, port, username");
+        }
+        configMap[conf.name] = conf;
+      }
+    }
+
+    // Priority 3: Compatible with single connection legacy parameters
     if (Object.keys(configMap).length === 0) {
       const host = values.host || positionals[0];
       const portStr = values.port || positionals[1];
@@ -130,6 +153,96 @@ export class CommandLineParser {
     return {
       configs: configMap,
       preConnect: values["pre-connect"] === true,
+    };
+  }
+
+  /**
+   * Parse legacy comma-separated format: name=dev,host=1.2.3.4,port=22,user=alice,password=xxx
+   * @private
+   */
+  private static parseLegacySshFormat(sshStr: string): SSHConfig {
+    const conf: any = {};
+    const parts = sshStr.split(",");
+    
+    for (const part of parts) {
+      // Only split on the first '=' to handle values containing '='
+      const equalIndex = part.indexOf("=");
+      if (equalIndex > 0) {
+        const k = part.substring(0, equalIndex).trim();
+        const v = part.substring(equalIndex + 1).trim();
+        if (k && v) {
+          conf[k] = v;
+        }
+      }
+    }
+    
+    const port = parseInt(conf.port, 10);
+    if (isNaN(port)) {
+      throw new Error(
+        `Port for connection ${conf.name || "unknown"} must be a valid number`
+      );
+    }
+    
+    return {
+      name: conf.name,
+      host: conf.host,
+      port,
+      username: conf.user,
+      password: conf.password,
+      privateKey: conf.privateKey,
+      passphrase: conf.passphrase,
+      socksProxy: conf.socksProxy,
+      commandWhitelist: conf.whitelist
+        ? conf.whitelist
+            .split("|")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
+        : undefined,
+      commandBlacklist: conf.blacklist
+        ? conf.blacklist
+            .split("|")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
+        : undefined,
+    };
+  }
+
+  /**
+   * Normalize SSH config object to ensure proper types and structure
+   * @private
+   */
+  private static normalizeConfig(config: any): SSHConfig {
+    const port = typeof config.port === "number" 
+      ? config.port 
+      : parseInt(config.port, 10);
+    
+    if (isNaN(port)) {
+      throw new Error(`Port must be a valid number, got: ${config.port}`);
+    }
+    
+    return {
+      name: config.name,
+      host: config.host,
+      port,
+      username: config.username || config.user,
+      password: config.password,
+      privateKey: config.privateKey,
+      passphrase: config.passphrase,
+      socksProxy: config.socksProxy,
+      commandWhitelist: Array.isArray(config.commandWhitelist)
+        ? config.commandWhitelist
+        : config.whitelist
+        ? typeof config.whitelist === "string"
+          ? config.whitelist.split("|").map((s: string) => s.trim()).filter(Boolean)
+          : config.whitelist
+        : undefined,
+      commandBlacklist: Array.isArray(config.commandBlacklist)
+        ? config.commandBlacklist
+        : config.blacklist
+        ? typeof config.blacklist === "string"
+          ? config.blacklist.split("|").map((s: string) => s.trim()).filter(Boolean)
+          : config.blacklist
+        : undefined,
     };
   }
 }

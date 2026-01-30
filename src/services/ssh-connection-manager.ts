@@ -91,8 +91,6 @@ export class SSHConnectionManager {
         resolve();
 
         // 延迟执行系统状态收集，避免与用户的第一个命令竞争 SSH 通道
-        // 这修复了首次连接后第一个命令失败的竞态条件问题
-        // See: https://github.com/classfang/ssh-mcp-server/issues/XX
         setTimeout(() => {
           collectSystemStatus(client, key)
             .then((status) => {

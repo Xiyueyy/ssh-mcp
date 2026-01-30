@@ -54,6 +54,8 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 
 ```text
 Options:
+  --config-file       JSON configuration file path (recommended for multiple servers)
+  --ssh               SSH connection configuration (can be JSON string or legacy format)
   -h, --host          SSH server host address
   -p, --port          SSH server port
   -u, --username      SSH username
@@ -63,6 +65,7 @@ Options:
   -W, --whitelist     Command whitelist, comma-separated regular expressions
   -B, --blacklist     Command blacklist, comma-separated regular expressions
   -s, --socksProxy    SOCKS proxy server address (e.g., socks://user:password@host:port)
+  --pre-connect       Pre-connect to all configured SSH servers on startup
 
 ```
 
@@ -199,13 +202,102 @@ Example: Using Command Blacklist
 
 ### 🧩 Multi-SSH Connection Example
 
-You can specify multiple SSH connections by passing multiple --ssh parameters, each with a unique name:
+There are three ways to configure multiple SSH connections:
+
+#### 📄 Method 1: Using Config File (Recommended)
+
+Create a JSON configuration file (e.g., `ssh-config.json`):
+
+**Array Format:**
+```json
+[
+  {
+    "name": "dev",
+    "host": "1.2.3.4",
+    "port": 22,
+    "username": "alice",
+    "password": "{abc=P100s0}",
+    "socksProxy": "socks://127.0.0.1:10808"
+  },
+  {
+    "name": "prod",
+    "host": "5.6.7.8",
+    "port": 22,
+    "username": "bob",
+    "password": "yyy",
+    "socksProxy": "socks://127.0.0.1:10808"
+  }
+]
+```
+
+**Object Format:**
+```json
+{
+  "dev": {
+    "host": "1.2.3.4",
+    "port": 22,
+    "username": "alice",
+    "password": "{abc=P100s0}",
+    "socksProxy": "socks://127.0.0.1:10808"
+  },
+  "prod": {
+    "host": "5.6.7.8",
+    "port": 22,
+    "username": "bob",
+    "password": "yyy",
+    "socksProxy": "socks://127.0.0.1:10808"
+  }
+}
+```
+
+Then use the `--config-file` parameter:
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--config-file", "ssh-config.json"
+      ]
+    }
+  }
+}
+```
+
+#### 🔧 Method 2: Using JSON Format with --ssh Parameter
+
+You can pass JSON-formatted configuration strings directly:
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--ssh", "{\"name\":\"dev\",\"host\":\"1.2.3.4\",\"port\":22,\"username\":\"alice\",\"password\":\"{abc=P100s0}\",\"socksProxy\":\"socks://127.0.0.1:10808\"}",
+        "--ssh", "{\"name\":\"prod\",\"host\":\"5.6.7.8\",\"port\":22,\"username\":\"bob\",\"password\":\"yyy\",\"socksProxy\":\"socks://127.0.0.1:10808\"}"
+      ]
+    }
+  }
+}
+```
+
+#### 📝 Method 3: Legacy Comma-Separated Format (Backward Compatible)
+
+For simple cases without special characters in passwords, you can still use the legacy format:
 
 ```bash
 npx @fangjunjie/ssh-mcp-server \
   --ssh "name=dev,host=1.2.3.4,port=22,user=alice,password=xxx" \
   --ssh "name=prod,host=5.6.7.8,port=22,user=bob,password=yyy"
 ```
+
+> **⚠️ Note**: The legacy format may have issues with passwords containing special characters like `=`, `,`, `{`, `}`. Use Method 1 or Method 2 for passwords with special characters.
 
 In MCP tool calls, specify the connection name via the `connectionName` parameter. If omitted, the default connection is used.
 

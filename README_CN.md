@@ -46,6 +46,8 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 
 ```text
 选项:
+  --config-file       JSON 配置文件路径（推荐用于多服务器配置）
+  --ssh               SSH 连接配置（可以是 JSON 字符串或旧格式）
   -h, --host          SSH 服务器主机地址
   -p, --port          SSH 服务器端口
   -u, --username      SSH 用户名
@@ -55,6 +57,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
   -W, --whitelist     命令白名单，以逗号分隔的正则表达式
   -B, --blacklist     命令黑名单，以逗号分隔的正则表达式
   -s, --socksProxy    SOCKS 代理地址 (e.g., socks://user:password@host:port)
+  --pre-connect       启动时预连接所有配置的 SSH 服务器
 ```
 
 #### 🔑 使用密码
@@ -189,13 +192,104 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 
 ### 🧩 多SSH连接用法示例
 
-可以通过多次 --ssh 参数指定多个SSH连接，每个连接需有唯一name：
+有三种方式可以配置多个 SSH 连接：
+
+#### 📄 方式一：使用配置文件（推荐）
+
+创建 JSON 配置文件（例如 `ssh-config.json`）：
+
+**数组格式：**
+
+```json
+[
+  {
+    "name": "dev",
+    "host": "1.2.3.4",
+    "port": 22,
+    "username": "alice",
+    "password": "{abc=P100s0}",
+    "socksProxy": "socks://127.0.0.1:10808"
+  },
+  {
+    "name": "prod",
+    "host": "5.6.7.8",
+    "port": 22,
+    "username": "bob",
+    "password": "yyy",
+    "socksProxy": "socks://127.0.0.1:10808"
+  }
+]
+```
+
+**对象格式：**
+
+```json
+{
+  "dev": {
+    "host": "1.2.3.4",
+    "port": 22,
+    "username": "alice",
+    "password": "{abc=P100s0}",
+    "socksProxy": "socks://127.0.0.1:10808"
+  },
+  "prod": {
+    "host": "5.6.7.8",
+    "port": 22,
+    "username": "bob",
+    "password": "yyy",
+    "socksProxy": "socks://127.0.0.1:10808"
+  }
+}
+```
+
+然后使用 `--config-file` 参数：
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--config-file", "ssh-config.json"
+      ]
+    }
+  }
+}
+```
+
+#### 🔧 方式二：使用 JSON 格式的 --ssh 参数
+
+可以直接传递 JSON 格式的配置字符串：
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--ssh", "{\"name\":\"dev\",\"host\":\"1.2.3.4\",\"port\":22,\"username\":\"alice\",\"password\":\"{abc=P100s0}\",\"socksProxy\":\"socks://127.0.0.1:10808\"}",
+        "--ssh", "{\"name\":\"prod\",\"host\":\"5.6.7.8\",\"port\":22,\"username\":\"bob\",\"password\":\"yyy\",\"socksProxy\":\"socks://127.0.0.1:10808\"}"
+      ]
+    }
+  }
+}
+```
+
+#### 📝 方式三：旧格式逗号分隔（向后兼容）
+
+对于密码中不包含特殊字符的简单情况，仍可使用旧格式：
 
 ```bash
 npx @fangjunjie/ssh-mcp-server \
   --ssh "name=dev,host=1.2.3.4,port=22,user=alice,password=xxx" \
   --ssh "name=prod,host=5.6.7.8,port=22,user=bob,password=yyy"
 ```
+
+> **⚠️ 注意**：旧格式在处理包含特殊字符（如 `=`、`,`、`{`、`}`）的密码时可能会有问题。如果密码包含特殊字符，请使用方式一或方式二。
 
 在MCP工具调用时，通过 `connectionName` 参数指定目标连接名称，未指定时使用默认连接。
 
@@ -254,6 +348,15 @@ npx @fangjunjie/ssh-mcp-server \
 ]
 ```
 
+## 🛡️ 安全注意事项
+
+该服务器提供了在远程服务器上执行命令和传输文件的强大功能。为确保安全使用，请注意以下几点：
+
+- **命令白名单**：*强烈建议* 使用 `--whitelist` 选项来限制可执行的命令集合。如果没有白名单，任何命令都可以在远程服务器上执行，这可能带来重大的安全风险。
+- **私钥安全**：服务器会将 SSH 私钥读入内存。请确保运行 `ssh-mcp-server` 的机器是安全的。不要将服务器暴露给不受信任的网络。
+- **拒绝服务攻击 (DoS)**：服务器没有内置的速率限制。攻击者可能通过向服务器发送大量连接请求或大文件传输来发起 DoS 攻击。建议在具有速率限制功能的防火墙或反向代理后面运行服务器。
+- **路径遍历**：服务器内置了对本地文件系统路径遍历攻击的保护。但是，仍然需要注意在 `upload` 和 `download` 命令中使用的路径。
+
 ## 🎮 演示
 
 ### 🖥️ Cursor 接入
@@ -261,3 +364,7 @@ npx @fangjunjie/ssh-mcp-server \
 ![demo_1.png](images/demo_1.png)
 
 ![demo_2.png](images/demo_2.png)
+
+## 🌟 Star 历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=classfang/ssh-mcp-server&type=date&legend=top-left)](https://www.star-history.com/#classfang/ssh-mcp-server&type=date&legend=top-left)

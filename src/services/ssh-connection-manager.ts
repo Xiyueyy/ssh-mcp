@@ -364,16 +364,29 @@ export class SSHConnectionManager {
           );
 
           // Handle command completion and exit code
-          stream.on("close", () => {
+          stream.on("close", (code?: number, signal?: string) => {
             cleanup();
             if (settled) {
               return;
             }
             settled = true;
 
+            if (exitCode === undefined) {
+              exitCode = code;
+            }
+
+            if (!exitSignal && signal) {
+              exitSignal = signal;
+            }
+
             const stdout = data.trimEnd();
             const stderr = errorData.trimEnd();
-            if (exitCode !== undefined && exitCode !== 0) {
+            const hasNonZeroExitCode =
+              exitCode !== undefined && exitCode !== 0;
+            const hasExitSignal =
+              exitSignal !== undefined && exitSignal !== "";
+
+            if (hasNonZeroExitCode || hasExitSignal) {
               reject(
                 new Error(
                   this.formatCommandFailure(
@@ -381,13 +394,18 @@ export class SSHConnectionManager {
                     stderr,
                     exitCode,
                     exitSignal,
-                  ) || `Command failed with exit code ${exitCode}`,
+                  ) ||
+                    (hasExitSignal
+                      ? `Command terminated by signal ${exitSignal}${
+                          exitCode !== undefined ? ` (exit code ${exitCode})` : ""
+                        }`
+                      : `Command failed with exit code ${exitCode}`),
                 ),
               );
               return;
             }
 
-            resolve(this.formatCommandFailure(stdout, stderr, exitCode, exitSignal));
+            resolve(stdout);
           });
 
           // Handle stream errors during execution

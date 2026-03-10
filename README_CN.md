@@ -47,15 +47,16 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 ```text
 选项:
   --config-file       JSON 配置文件路径（推荐用于多服务器配置）
+  --ssh-config-file   SSH 配置文件路径（默认: ~/.ssh/config）
   --ssh               SSH 连接配置（可以是 JSON 字符串或旧格式）
-  -h, --host          SSH 服务器主机地址
+  -h, --host          SSH 服务器主机地址或 SSH 配置中的别名
   -p, --port          SSH 服务器端口
   -u, --username      SSH 用户名
   -w, --password      SSH 密码
   -k, --privateKey    SSH 私钥文件路径
   -P, --passphrase    私钥密码（如果有的话）
   -W, --whitelist     命令白名单，以逗号分隔的正则表达式
-  -B, --blacklist     命令黑名单，以逗号分隔的正则表达式
+  -B, --blacklist     命令黑名单,以逗号分隔的正则表达式
   -s, --socksProxy    SOCKS 代理地址 (e.g., socks://user:password@host:port)
   --pty               为命令执行分配伪终端 (默认: true)
   --pre-connect       启动时预连接所有配置的 SSH 服务器
@@ -121,6 +122,55 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
   }
 }
 ```
+
+#### 📋 使用 ~/.ssh/config
+
+你可以使用 `~/.ssh/config` 文件中定义的主机别名。服务器会自动从 SSH 配置中读取连接参数：
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--host", "myserver"
+      ]
+    }
+  }
+}
+```
+
+假设你的 `~/.ssh/config` 包含：
+
+```
+Host myserver
+    HostName 192.168.1.1
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+```
+
+你也可以指定自定义的 SSH 配置文件路径：
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--host", "myserver",
+        "--ssh-config-file", "/path/to/custom/ssh_config"
+      ]
+    }
+  }
+}
+```
+
+**注意**：命令行参数优先级高于 SSH 配置值。例如，如果你指定了 `--port 2222`，它会覆盖 SSH 配置中的端口。
 
 #### 🌐 使用 SOCKS 代理
 

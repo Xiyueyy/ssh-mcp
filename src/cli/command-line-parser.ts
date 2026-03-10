@@ -2,6 +2,7 @@ import { parseArgs } from "node:util";
 import { SSHConfig, SshConnectionConfigMap, ParsedArgs } from "../models/types.js";
 import fs from "fs";
 import path from "path";
+import { lookupSshConfig } from "../utils/ssh-config-parser.js";
 
 /**
  * Command line argument parser class
@@ -15,6 +16,7 @@ export class CommandLineParser {
       args: process.argv.slice(2),
       options: {
         "config-file": { type: "string" },
+        "ssh-config-file": { type: "string" },
         ssh: { type: "string", multiple: true },
         // Compatible with single connection legacy parameters
         host: { type: "string", short: "h" },
@@ -108,16 +110,31 @@ export class CommandLineParser {
     // Priority 3: Compatible with single connection legacy parameters
     if (Object.keys(configMap).length === 0) {
       const host = values.host || positionals[0];
-      const portStr = values.port || positionals[1];
-      const username = values.username || positionals[2];
+
+      // 尝试从 SSH config 读取配置
+      let sshConfigEntry = null;
+      if (host) {
+        try {
+          sshConfigEntry = lookupSshConfig(host, values["ssh-config-file"]);
+        } catch (err) {
+          // 显式指定配置文件但读取失败时抛错
+          throw err;
+        }
+      }
+
+      const portStr = values.port || positionals[1] || sshConfigEntry?.port?.toString();
+      const username = values.username || positionals[2] || sshConfigEntry?.user;
       const password = values.password || positionals[3];
-      const privateKey = values.privateKey;
+      const privateKey = values.privateKey || sshConfigEntry?.identityFile;
       const passphrase = values.passphrase;
       const whitelist = values.whitelist;
       const blacklist = values.blacklist;
       const pty = values.pty;
 
-      if (!host || !portStr || !username || (!password && !privateKey)) {
+      // 实际连接地址：优先使用 SSH config 的 HostName
+      const actualHost = sshConfigEntry?.hostName || host;
+
+      if (!actualHost || !portStr || !username || (!password && !privateKey)) {
         throw new Error(
           "Missing required parameters, need to provide host, port, username and password or private key"
         );
@@ -130,7 +147,7 @@ export class CommandLineParser {
 
       configMap["default"] = {
         name: "default",
-        host,
+        host: actualHost,
         port,
         username,
         password,

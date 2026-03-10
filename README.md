@@ -55,8 +55,9 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 ```text
 Options:
   --config-file       JSON configuration file path (recommended for multiple servers)
+  --ssh-config-file   SSH config file path (default: ~/.ssh/config)
   --ssh               SSH connection configuration (can be JSON string or legacy format)
-  -h, --host          SSH server host address
+  -h, --host          SSH server host address or alias from SSH config
   -p, --port          SSH server port
   -u, --username      SSH username
   -w, --password      SSH password
@@ -130,6 +131,55 @@ Options:
   }
 }
 ```
+
+#### 📋 Using ~/.ssh/config
+
+You can use host aliases defined in your `~/.ssh/config` file. The server will automatically read connection parameters from the SSH config:
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--host", "myserver"
+      ]
+    }
+  }
+}
+```
+
+Assuming your `~/.ssh/config` contains:
+
+```
+Host myserver
+    HostName 192.168.1.1
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+```
+
+You can also specify a custom SSH config file path:
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@fangjunjie/ssh-mcp-server",
+        "--host", "myserver",
+        "--ssh-config-file", "/path/to/custom/ssh_config"
+      ]
+    }
+  }
+}
+```
+
+**Note**: Command-line parameters take precedence over SSH config values. For example, if you specify `--port 2222`, it will override the port from SSH config.
 
 #### 🌐 Using SOCKS Proxy
 

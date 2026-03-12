@@ -1,0 +1,6 @@
+Include F:\blog\ssh-mcp-server\test\fixtures\ssh-config-nested
+Host main-host
+    HostName 192.168.1.1
+    User mainuser
+Host *
+    Port 22

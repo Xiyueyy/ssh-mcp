@@ -1,0 +1,14 @@
+Host dev staging
+    HostName 192.168.1.100
+    Port 2222
+    User devuser
+    IdentityFile ~/.ssh/dev_key
+Host prod
+    HostName 10.0.0.50
+    User produser
+Host *.example.com
+    User wildcarduser
+    Port 2200
+Host *
+    Port 22
+    User defaultuser

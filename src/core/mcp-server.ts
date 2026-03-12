@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { SSHConnectionManager } from "../services/ssh-connection-manager.js";
+import { AstrBotAdminAuth } from "../services/astrbot-admin-auth.js";
 import { CommandLineParser } from "../cli/command-line-parser.js";
 import { Logger } from "../utils/logger.js";
 import { registerAllTools } from "../tools/index.js";
@@ -12,11 +13,13 @@ import { SERVER_CONFIG } from "../config/server.js";
 export class SshMcpServer {
   private server: McpServer;
   private sshManager: SSHConnectionManager;
+  private adminAuth: AstrBotAdminAuth;
 
   constructor() {
     this.server = new McpServer(SERVER_CONFIG);
 
     this.sshManager = SSHConnectionManager.getInstance();
+    this.adminAuth = AstrBotAdminAuth.getInstance();
   }
 
   /**
@@ -33,6 +36,8 @@ export class SshMcpServer {
     // Initialize SSH configuration
     const parsedArgs = CommandLineParser.parseArgs();
     this.sshManager.setConfig(parsedArgs.configs);
+    this.adminAuth.configure(parsedArgs.auth);
+    this.adminAuth.logStatus();
 
     // Security warning
     const allConfigs = Object.values(parsedArgs.configs);

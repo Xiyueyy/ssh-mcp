@@ -1,5 +1,9 @@
 import { parseArgs } from "node:util";
-import { SSHConfig, SshConnectionConfigMap, ParsedArgs } from "../models/types.js";
+import {
+  SSHConfig,
+  SshConnectionConfigMap,
+  ParsedArgs,
+} from "../models/types.js";
 import fs from "fs";
 import path from "path";
 import { lookupSshConfig } from "../utils/ssh-config-parser.js";
@@ -30,6 +34,9 @@ export class CommandLineParser {
         socksProxy: { type: "string", short: "s" },
         pty: { type: "boolean" },
         "pre-connect": { type: "boolean" },
+        "astrbot-config-file": { type: "string" },
+        "require-astrbot-admin": { type: "boolean" },
+        "admin-ids": { type: "string" },
       },
       allowPositionals: true,
     });
@@ -170,10 +177,54 @@ export class CommandLineParser {
       };
     }
 
+    const astrBotConfigPath =
+      values["astrbot-config-file"] ||
+      process.env.SSH_MCP_ASTRBOT_CONFIG_PATH ||
+      process.env.ASTRBOT_CONFIG_PATH;
+
+    const adminIds = this.parseAdminIds(
+      values["admin-ids"] ||
+        process.env.SSH_MCP_ADMIN_IDS ||
+        process.env.ADMIN_IDS,
+    );
+
+    const requireAstrBotAdmin =
+      values["require-astrbot-admin"] === true ||
+      this.isTruthyEnv(process.env.SSH_MCP_REQUIRE_ASTRBOT_ADMIN) ||
+      this.isTruthyEnv(process.env.REQUIRE_ASTRBOT_ADMIN) ||
+      adminIds.length > 0 ||
+      Boolean(astrBotConfigPath);
+
     return {
       configs: configMap,
       preConnect: values["pre-connect"] === true,
+      auth: {
+        requireAstrBotAdmin,
+        adminIds,
+        astrBotConfigPath: astrBotConfigPath
+          ? path.resolve(astrBotConfigPath)
+          : undefined,
+      },
     };
+  }
+
+  private static isTruthyEnv(value: string | undefined): boolean {
+    if (!value) {
+      return false;
+    }
+
+    return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+  }
+
+  private static parseAdminIds(value: string | undefined): string[] {
+    if (!value) {
+      return [];
+    }
+
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
   }
 
   /**

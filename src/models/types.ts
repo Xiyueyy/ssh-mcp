@@ -26,6 +26,15 @@ export type SshConnectionConfigMap = Record<string, SSHConfig>;
 export type LogLevel = "info" | "error" | "debug";
 
 /**
+ * AstrBot admin authentication configuration
+ */
+export interface AstrBotAdminAuthConfig {
+  requireAstrBotAdmin: boolean;
+  astrBotConfigPath?: string;
+  adminIds?: string[];
+}
+
+/**
  * System status information
  */
 export interface ServerStatus {
@@ -79,4 +88,5 @@ export interface ServerStatus {
 export interface ParsedArgs {
   configs: SshConnectionConfigMap;
   preConnect: boolean;
+  auth: AstrBotAdminAuthConfig;
 }

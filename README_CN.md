@@ -1,68 +1,68 @@
-# 🔐 ssh-mcp-server
+﻿# 馃攼 ssh-mcp-server
 
-基于 SSH 的 MCP (Model Context Protocol) 服务器，允许通过 MCP 协议远程执行 SSH 命令。
+鍩轰簬 SSH 鐨?MCP (Model Context Protocol) 鏈嶅姟鍣紝鍏佽閫氳繃 MCP 鍗忚杩滅▼鎵ц SSH 鍛戒护銆?
 
-[English Document](README.md) | 中文文档
+[English Document](README.md) | 涓枃鏂囨。
 
-## 📝 项目介绍
+## 馃摑 椤圭洰浠嬬粛
 
-ssh-mcp-server 是一个桥接工具，可以让 AI 助手等支持 MCP 协议的应用通过标准化接口执行远程 SSH 命令。这使得 AI 助手能够安全地操作远程服务器，执行命令并获取结果，而无需直接暴露 SSH 凭据给 AI 模型。
+ssh-mcp-server 鏄竴涓ˉ鎺ュ伐鍏凤紝鍙互璁?AI 鍔╂墜绛夋敮鎸?MCP 鍗忚鐨勫簲鐢ㄩ€氳繃鏍囧噯鍖栨帴鍙ｆ墽琛岃繙绋?SSH 鍛戒护銆傝繖浣垮緱 AI 鍔╂墜鑳藉瀹夊叏鍦版搷浣滆繙绋嬫湇鍔″櫒锛屾墽琛屽懡浠ゅ苟鑾峰彇缁撴灉锛岃€屾棤闇€鐩存帴鏆撮湶 SSH 鍑嵁缁?AI 妯″瀷銆?
 
-微信MCP技术交流群：
+寰俊MCP鎶€鏈氦娴佺兢锛?
 
 ![wx_1.png](images/wx_1.png)
 
-## ✨ 功能亮点
+## 鉁?鍔熻兘浜偣
 
-- **🔒 安全连接**：支持多种安全的 SSH 连接方式，包括密码认证和私钥认证（支持带密码的私钥）
-- **🛡️ 命令安全控制**：通过灵活的黑白名单机制，精确控制允许执行的命令范围，防止危险操作
-- **🔄 标准化接口**：符合 MCP 协议规范，与支持该协议的 AI 助手无缝集成
-- **📂 文件传输**：支持双向文件传输功能，可上传本地文件到服务器或从服务器下载文件
-- **🔑 凭据隔离**：SSH 凭据完全在本地管理，不会暴露给 AI 模型，增强安全性
-- **🚀 即用即走**：使用 NPX 可直接运行，无需全局安装，方便快捷
+- **馃敀 瀹夊叏杩炴帴**锛氭敮鎸佸绉嶅畨鍏ㄧ殑 SSH 杩炴帴鏂瑰紡锛屽寘鎷瘑鐮佽璇佸拰绉侀挜璁よ瘉锛堟敮鎸佸甫瀵嗙爜鐨勭閽ワ級
+- **馃洝锔?鍛戒护瀹夊叏鎺у埗**锛氶€氳繃鐏垫椿鐨勯粦鐧藉悕鍗曟満鍒讹紝绮剧‘鎺у埗鍏佽鎵ц鐨勫懡浠よ寖鍥达紝闃叉鍗遍櫓鎿嶄綔
+- **馃攧 鏍囧噯鍖栨帴鍙?*锛氱鍚?MCP 鍗忚瑙勮寖锛屼笌鏀寔璇ュ崗璁殑 AI 鍔╂墜鏃犵紳闆嗘垚
+- **馃搨 鏂囦欢浼犺緭**锛氭敮鎸佸弻鍚戞枃浠朵紶杈撳姛鑳斤紝鍙笂浼犳湰鍦版枃浠跺埌鏈嶅姟鍣ㄦ垨浠庢湇鍔″櫒涓嬭浇鏂囦欢
+- **馃攽 鍑嵁闅旂**锛歋SH 鍑嵁瀹屽叏鍦ㄦ湰鍦扮鐞嗭紝涓嶄細鏆撮湶缁?AI 妯″瀷锛屽寮哄畨鍏ㄦ€?
+- **馃殌 鍗崇敤鍗宠蛋**锛氫娇鐢?NPX 鍙洿鎺ヨ繍琛岋紝鏃犻渶鍏ㄥ眬瀹夎锛屾柟渚垮揩鎹?
 
-## 📦 开源仓库
+## 馃摝 寮€婧愪粨搴?
 
-GitHub：[https://github.com/classfang/ssh-mcp-server](https://github.com/classfang/ssh-mcp-server)
+GitHub锛歔https://github.com/Xiyueyy/ssh-mcp](https://github.com/Xiyueyy/ssh-mcp)
 
-NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server)
+NPM: [https://www.npmjs.com/package/@xiyueyy/ssh-mcp](https://www.npmjs.com/package/@xiyueyy/ssh-mcp)
 
-## 🛠️ 工具列表
+## 馃洜锔?宸ュ叿鍒楄〃
 
-| 工具 | 名称 | 描述 |
+| 宸ュ叿 | 鍚嶇О | 鎻忚堪 |
 |---------|-----------|----------|
-| execute-command | 命令执行工具 | 在远程服务器上执行 SSH 命令并获取执行结果 |
-| upload | 文件上传工具 | 将本地文件上传到远程服务器指定位置 |
-| download | 文件下载工具 | 从远程服务器下载文件到本地指定位置 |
-| list-servers | 服务器列表工具 | 列出所有可用SSH服务器配置 |
+| execute-command | 鍛戒护鎵ц宸ュ叿 | 鍦ㄨ繙绋嬫湇鍔″櫒涓婃墽琛?SSH 鍛戒护骞惰幏鍙栨墽琛岀粨鏋?|
+| upload | 鏂囦欢涓婁紶宸ュ叿 | 灏嗘湰鍦版枃浠朵笂浼犲埌杩滅▼鏈嶅姟鍣ㄦ寚瀹氫綅缃?|
+| download | 鏂囦欢涓嬭浇宸ュ叿 | 浠庤繙绋嬫湇鍔″櫒涓嬭浇鏂囦欢鍒版湰鍦版寚瀹氫綅缃?|
+| list-servers | 鏈嶅姟鍣ㄥ垪琛ㄥ伐鍏?| 鍒楀嚭鎵€鏈夊彲鐢⊿SH鏈嶅姟鍣ㄩ厤缃?|
 
-## 📚 使用方法
+## 馃摎 浣跨敤鏂规硶
 
-### 🔧 MCP 配置示例
+### 馃敡 MCP 閰嶇疆绀轰緥
 
-> **⚠️ 重要提示**: 在 MCP 配置文件中，每个命令行参数和其值必须是 `args` 数组中的独立元素。不要用空格将它们连接在一起。例如，使用 `"--host", "192.168.1.1"` 而不是 `"--host 192.168.1.1"`。
+> **鈿狅笍 閲嶈鎻愮ず**: 鍦?MCP 閰嶇疆鏂囦欢涓紝姣忎釜鍛戒护琛屽弬鏁板拰鍏跺€煎繀椤绘槸 `args` 鏁扮粍涓殑鐙珛鍏冪礌銆備笉瑕佺敤绌烘牸灏嗗畠浠繛鎺ュ湪涓€璧枫€備緥濡傦紝浣跨敤 `"--host", "192.168.1.1"` 鑰屼笉鏄?`"--host 192.168.1.1"`銆?
 
-#### ⚙️ 命令行选项
+#### 鈿欙笍 鍛戒护琛岄€夐」
 
 ```text
-选项:
-  --config-file       JSON 配置文件路径（推荐用于多服务器配置）
-  --ssh-config-file   SSH 配置文件路径（默认: ~/.ssh/config）
-  --ssh               SSH 连接配置（可以是 JSON 字符串或旧格式）
-  -h, --host          SSH 服务器主机地址或 SSH 配置中的别名
-  -p, --port          SSH 服务器端口
-  -u, --username      SSH 用户名
-  -w, --password      SSH 密码
-  -k, --privateKey    SSH 私钥文件路径
-  -P, --passphrase    私钥密码（如果有的话）
-  -W, --whitelist     命令白名单，以逗号分隔的正则表达式
-  -B, --blacklist     命令黑名单,以逗号分隔的正则表达式
-  -s, --socksProxy    SOCKS 代理地址 (e.g., socks://user:password@host:port)
-  --pty               为命令执行分配伪终端 (默认: true)
-  --pre-connect       启动时预连接所有配置的 SSH 服务器
+閫夐」:
+  --config-file       JSON 閰嶇疆鏂囦欢璺緞锛堟帹鑽愮敤浜庡鏈嶅姟鍣ㄩ厤缃級
+  --ssh-config-file   SSH 閰嶇疆鏂囦欢璺緞锛堥粯璁? ~/.ssh/config锛?
+  --ssh               SSH 杩炴帴閰嶇疆锛堝彲浠ユ槸 JSON 瀛楃涓叉垨鏃ф牸寮忥級
+  -h, --host          SSH 鏈嶅姟鍣ㄤ富鏈哄湴鍧€鎴?SSH 閰嶇疆涓殑鍒悕
+  -p, --port          SSH 鏈嶅姟鍣ㄧ鍙?
+  -u, --username      SSH 鐢ㄦ埛鍚?
+  -w, --password      SSH 瀵嗙爜
+  -k, --privateKey    SSH 绉侀挜鏂囦欢璺緞
+  -P, --passphrase    绉侀挜瀵嗙爜锛堝鏋滄湁鐨勮瘽锛?
+  -W, --whitelist     鍛戒护鐧藉悕鍗曪紝浠ラ€楀彿鍒嗛殧鐨勬鍒欒〃杈惧紡
+  -B, --blacklist     鍛戒护榛戝悕鍗?浠ラ€楀彿鍒嗛殧鐨勬鍒欒〃杈惧紡
+  -s, --socksProxy    SOCKS 浠ｇ悊鍦板潃 (e.g., socks://user:password@host:port)
+  --pty               涓哄懡浠ゆ墽琛屽垎閰嶄吉缁堢 (榛樿: true)
+  --pre-connect       鍚姩鏃堕杩炴帴鎵€鏈夐厤缃殑 SSH 鏈嶅姟鍣?
 ```
 
-#### 🔑 使用密码
+#### 馃攽 浣跨敤瀵嗙爜
 
 ```json
 {
@@ -71,7 +71,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -82,7 +82,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 }
 ```
 
-#### 🔐 使用私钥
+#### 馃攼 浣跨敤绉侀挜
 
 ```json
 {
@@ -91,7 +91,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -102,7 +102,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 }
 ```
 
-#### 🔏 使用带密码私钥
+#### 馃攺 浣跨敤甯﹀瘑鐮佺閽?
 
 ```json
 {
@@ -111,7 +111,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -123,9 +123,9 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 }
 ```
 
-#### 📋 使用 ~/.ssh/config
+#### 馃搵 浣跨敤 ~/.ssh/config
 
-你可以使用 `~/.ssh/config` 文件中定义的主机别名。服务器会自动从 SSH 配置中读取连接参数：
+浣犲彲浠ヤ娇鐢?`~/.ssh/config` 鏂囦欢涓畾涔夌殑涓绘満鍒悕銆傛湇鍔″櫒浼氳嚜鍔ㄤ粠 SSH 閰嶇疆涓鍙栬繛鎺ュ弬鏁帮細
 
 ```json
 {
@@ -134,7 +134,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "myserver"
       ]
     }
@@ -142,7 +142,7 @@ NPM: [https://www.npmjs.com/package/@fangjunjie/ssh-mcp-server](https://www.npmj
 }
 ```
 
-假设你的 `~/.ssh/config` 包含：
+鍋囪浣犵殑 `~/.ssh/config` 鍖呭惈锛?
 
 ```
 Host myserver
@@ -152,7 +152,7 @@ Host myserver
     IdentityFile ~/.ssh/id_rsa
 ```
 
-你也可以指定自定义的 SSH 配置文件路径：
+浣犱篃鍙互鎸囧畾鑷畾涔夌殑 SSH 閰嶇疆鏂囦欢璺緞锛?
 
 ```json
 {
@@ -161,7 +161,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "myserver",
         "--ssh-config-file", "/path/to/custom/ssh_config"
       ]
@@ -170,9 +170,9 @@ Host myserver
 }
 ```
 
-**注意**：命令行参数优先级高于 SSH 配置值。例如，如果你指定了 `--port 2222`，它会覆盖 SSH 配置中的端口。
+**娉ㄦ剰**锛氬懡浠よ鍙傛暟浼樺厛绾ч珮浜?SSH 閰嶇疆鍊笺€備緥濡傦紝濡傛灉浣犳寚瀹氫簡 `--port 2222`锛屽畠浼氳鐩?SSH 閰嶇疆涓殑绔彛銆?
 
-#### 🌐 使用 SOCKS 代理
+#### 馃寪 浣跨敤 SOCKS 浠ｇ悊
 
 ```json
 {
@@ -181,7 +181,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -193,11 +193,11 @@ Host myserver
 }
 ```
 
-#### 📝 使用命令白名单和黑名单
+#### 馃摑 浣跨敤鍛戒护鐧藉悕鍗曞拰榛戝悕鍗?
 
-使用 `--whitelist` 和 `--blacklist` 参数可以限制可执行的命令范围，多个模式之间用逗号分隔。每个模式都是一个正则表达式，用于匹配命令。
+浣跨敤 `--whitelist` 鍜?`--blacklist` 鍙傛暟鍙互闄愬埗鍙墽琛岀殑鍛戒护鑼冨洿锛屽涓ā寮忎箣闂寸敤閫楀彿鍒嗛殧銆傛瘡涓ā寮忛兘鏄竴涓鍒欒〃杈惧紡锛岀敤浜庡尮閰嶅懡浠ゃ€?
 
-示例：使用命令白名单
+绀轰緥锛氫娇鐢ㄥ懡浠ょ櫧鍚嶅崟
 
 ```json
 {
@@ -206,7 +206,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -218,7 +218,7 @@ Host myserver
 }
 ```
 
-示例：使用命令黑名单
+绀轰緥锛氫娇鐢ㄥ懡浠ら粦鍚嶅崟
 
 ```json
 {
@@ -227,7 +227,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--host", "192.168.1.1",
         "--port", "22",
         "--username", "root",
@@ -239,17 +239,17 @@ Host myserver
 }
 ```
 
-> 注意：如果同时指定了白名单和黑名单，系统会先检查命令是否在白名单中，然后再检查是否在黑名单中。命令必须同时通过两项检查才能被执行。
+> 娉ㄦ剰锛氬鏋滃悓鏃舵寚瀹氫簡鐧藉悕鍗曞拰榛戝悕鍗曪紝绯荤粺浼氬厛妫€鏌ュ懡浠ゆ槸鍚﹀湪鐧藉悕鍗曚腑锛岀劧鍚庡啀妫€鏌ユ槸鍚﹀湪榛戝悕鍗曚腑銆傚懡浠ゅ繀椤诲悓鏃堕€氳繃涓ら」妫€鏌ユ墠鑳借鎵ц銆?
 
-### 🧩 多SSH连接用法示例
+### 馃З 澶歋SH杩炴帴鐢ㄦ硶绀轰緥
 
-有三种方式可以配置多个 SSH 连接：
+鏈変笁绉嶆柟寮忓彲浠ラ厤缃涓?SSH 杩炴帴锛?
 
-#### 📄 方式一：使用配置文件（推荐）
+#### 馃搫 鏂瑰紡涓€锛氫娇鐢ㄩ厤缃枃浠讹紙鎺ㄨ崘锛?
 
-创建 JSON 配置文件（例如 `ssh-config.json`）：
+鍒涘缓 JSON 閰嶇疆鏂囦欢锛堜緥濡?`ssh-config.json`锛夛細
 
-**数组格式：**
+**鏁扮粍鏍煎紡锛?*
 
 ```json
 [
@@ -272,7 +272,7 @@ Host myserver
 ]
 ```
 
-**对象格式：**
+**瀵硅薄鏍煎紡锛?*
 
 ```json
 {
@@ -293,7 +293,7 @@ Host myserver
 }
 ```
 
-然后使用 `--config-file` 参数：
+鐒跺悗浣跨敤 `--config-file` 鍙傛暟锛?
 
 ```json
 {
@@ -302,7 +302,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--config-file", "ssh-config.json"
       ]
     }
@@ -310,9 +310,9 @@ Host myserver
 }
 ```
 
-#### 🔧 方式二：使用 JSON 格式的 --ssh 参数
+#### 馃敡 鏂瑰紡浜岋細浣跨敤 JSON 鏍煎紡鐨?--ssh 鍙傛暟
 
-可以直接传递 JSON 格式的配置字符串：
+鍙互鐩存帴浼犻€?JSON 鏍煎紡鐨勯厤缃瓧绗︿覆锛?
 
 ```json
 {
@@ -321,7 +321,7 @@ Host myserver
       "command": "npx",
       "args": [
         "-y",
-        "@fangjunjie/ssh-mcp-server",
+        "@xiyueyy/ssh-mcp",
         "--ssh", "{\"name\":\"dev\",\"host\":\"1.2.3.4\",\"port\":22,\"username\":\"alice\",\"password\":\"{abc=P100s0}\",\"socksProxy\":\"socks://127.0.0.1:10808\"}",
         "--ssh", "{\"name\":\"prod\",\"host\":\"5.6.7.8\",\"port\":22,\"username\":\"bob\",\"password\":\"yyy\",\"socksProxy\":\"socks://127.0.0.1:10808\"}"
       ]
@@ -330,21 +330,21 @@ Host myserver
 }
 ```
 
-#### 📝 方式三：旧格式逗号分隔（向后兼容）
+#### 馃摑 鏂瑰紡涓夛細鏃ф牸寮忛€楀彿鍒嗛殧锛堝悜鍚庡吋瀹癸級
 
-对于密码中不包含特殊字符的简单情况，仍可使用旧格式：
+瀵逛簬瀵嗙爜涓笉鍖呭惈鐗规畩瀛楃鐨勭畝鍗曟儏鍐碉紝浠嶅彲浣跨敤鏃ф牸寮忥細
 
 ```bash
-npx @fangjunjie/ssh-mcp-server \
+npx @xiyueyy/ssh-mcp \
   --ssh "name=dev,host=1.2.3.4,port=22,user=alice,password=xxx" \
   --ssh "name=prod,host=5.6.7.8,port=22,user=bob,password=yyy"
 ```
 
-> **⚠️ 注意**：旧格式在处理包含特殊字符（如 `=`、`,`、`{`、`}`）的密码时可能会有问题。如果密码包含特殊字符，请使用方式一或方式二。
+> **鈿狅笍 娉ㄦ剰**锛氭棫鏍煎紡鍦ㄥ鐞嗗寘鍚壒娈婂瓧绗︼紙濡?`=`銆乣,`銆乣{`銆乣}`锛夌殑瀵嗙爜鏃跺彲鑳戒細鏈夐棶棰樸€傚鏋滃瘑鐮佸寘鍚壒娈婂瓧绗︼紝璇蜂娇鐢ㄦ柟寮忎竴鎴栨柟寮忎簩銆?
 
-在MCP工具调用时，通过 `connectionName` 参数指定目标连接名称，未指定时使用默认连接。
+鍦∕CP宸ュ叿璋冪敤鏃讹紝閫氳繃 `connectionName` 鍙傛暟鎸囧畾鐩爣杩炴帴鍚嶇О锛屾湭鎸囧畾鏃朵娇鐢ㄩ粯璁よ繛鎺ャ€?
 
-示例（在prod连接上执行命令）：
+绀轰緥锛堝湪prod杩炴帴涓婃墽琛屽懡浠わ級锛?
 
 ```json
 {
@@ -356,7 +356,7 @@ npx @fangjunjie/ssh-mcp-server \
 }
 ```
 
-示例（带超时选项的命令执行）：
+绀轰緥锛堝甫瓒呮椂閫夐」鐨勫懡浠ゆ墽琛岋級锛?
 
 ```json
 {
@@ -369,19 +369,19 @@ npx @fangjunjie/ssh-mcp-server \
 }
 ```
 
-### ⏱️ 命令执行超时
+### 鈴憋笍 鍛戒护鎵ц瓒呮椂
 
-`execute-command` 工具支持超时选项，防止命令无限期挂起：
+`execute-command` 宸ュ叿鏀寔瓒呮椂閫夐」锛岄槻姝㈠懡浠ゆ棤闄愭湡鎸傝捣锛?
 
-- **timeout**: 命令执行超时时间（毫秒，可选，默认为30000ms）
+- **timeout**: 鍛戒护鎵ц瓒呮椂鏃堕棿锛堟绉掞紝鍙€夛紝榛樿涓?0000ms锛?
 
-这对于像 `ping`、`tail -f` 或其他可能阻塞执行的长时间运行进程特别有用。
+杩欏浜庡儚 `ping`銆乣tail -f` 鎴栧叾浠栧彲鑳介樆濉炴墽琛岀殑闀挎椂闂磋繍琛岃繘绋嬬壒鍒湁鐢ㄣ€?
 
-### 🗂️ 列出所有SSH服务器
+### 馃梻锔?鍒楀嚭鎵€鏈塖SH鏈嶅姟鍣?
 
-可以通过MCP工具 `list-servers` 获取所有可用的SSH服务器配置：
+鍙互閫氳繃MCP宸ュ叿 `list-servers` 鑾峰彇鎵€鏈夊彲鐢ㄧ殑SSH鏈嶅姟鍣ㄩ厤缃細
 
-调用示例：
+璋冪敤绀轰緥锛?
 
 ```json
 {
@@ -390,7 +390,7 @@ npx @fangjunjie/ssh-mcp-server \
 }
 ```
 
-返回示例：
+杩斿洖绀轰緥锛?
 
 ```json
 [
@@ -399,23 +399,116 @@ npx @fangjunjie/ssh-mcp-server \
 ]
 ```
 
-## 🛡️ 安全注意事项
+## 馃洝锔?瀹夊叏娉ㄦ剰浜嬮」
 
-该服务器提供了在远程服务器上执行命令和传输文件的强大功能。为确保安全使用，请注意以下几点：
+璇ユ湇鍔″櫒鎻愪緵浜嗗湪杩滅▼鏈嶅姟鍣ㄤ笂鎵ц鍛戒护鍜屼紶杈撴枃浠剁殑寮哄ぇ鍔熻兘銆備负纭繚瀹夊叏浣跨敤锛岃娉ㄦ剰浠ヤ笅鍑犵偣锛?
 
-- **命令白名单**：*强烈建议* 使用 `--whitelist` 选项来限制可执行的命令集合。如果没有白名单，任何命令都可以在远程服务器上执行，这可能带来重大的安全风险。
-- **私钥安全**：服务器会将 SSH 私钥读入内存。请确保运行 `ssh-mcp-server` 的机器是安全的。不要将服务器暴露给不受信任的网络。
-- **拒绝服务攻击 (DoS)**：服务器没有内置的速率限制。攻击者可能通过向服务器发送大量连接请求或大文件传输来发起 DoS 攻击。建议在具有速率限制功能的防火墙或反向代理后面运行服务器。
-- **路径遍历**：服务器内置了对本地文件系统路径遍历攻击的保护。但是，仍然需要注意在 `upload` 和 `download` 命令中使用的路径。
+- **鍛戒护鐧藉悕鍗?*锛?寮虹儓寤鸿* 浣跨敤 `--whitelist` 閫夐」鏉ラ檺鍒跺彲鎵ц鐨勫懡浠ら泦鍚堛€傚鏋滄病鏈夌櫧鍚嶅崟锛屼换浣曞懡浠ら兘鍙互鍦ㄨ繙绋嬫湇鍔″櫒涓婃墽琛岋紝杩欏彲鑳藉甫鏉ラ噸澶х殑瀹夊叏椋庨櫓銆?
+- **绉侀挜瀹夊叏**锛氭湇鍔″櫒浼氬皢 SSH 绉侀挜璇诲叆鍐呭瓨銆傝纭繚杩愯 `ssh-mcp-server` 鐨勬満鍣ㄦ槸瀹夊叏鐨勩€備笉瑕佸皢鏈嶅姟鍣ㄦ毚闇茬粰涓嶅彈淇′换鐨勭綉缁溿€?
+- **鎷掔粷鏈嶅姟鏀诲嚮 (DoS)**锛氭湇鍔″櫒娌℃湁鍐呯疆鐨勯€熺巼闄愬埗銆傛敾鍑昏€呭彲鑳介€氳繃鍚戞湇鍔″櫒鍙戦€佸ぇ閲忚繛鎺ヨ姹傛垨澶ф枃浠朵紶杈撴潵鍙戣捣 DoS 鏀诲嚮銆傚缓璁湪鍏锋湁閫熺巼闄愬埗鍔熻兘鐨勯槻鐏鎴栧弽鍚戜唬鐞嗗悗闈㈣繍琛屾湇鍔″櫒銆?
+- **璺緞閬嶅巻**锛氭湇鍔″櫒鍐呯疆浜嗗鏈湴鏂囦欢绯荤粺璺緞閬嶅巻鏀诲嚮鐨勪繚鎶ゃ€備絾鏄紝浠嶇劧闇€瑕佹敞鎰忓湪 `upload` 鍜?`download` 鍛戒护涓娇鐢ㄧ殑璺緞銆?
 
-## 🎮 演示
+## 馃幃 婕旂ず
 
-### 🖥️ Cursor 接入
+### 馃枼锔?Cursor 鎺ュ叆
 
 ![demo_1.png](images/demo_1.png)
 
 ![demo_2.png](images/demo_2.png)
 
-## 🌟 Star 历史
+## 馃専 Star 鍘嗗彶
 
-[![Star History Chart](https://api.star-history.com/svg?repos=classfang/ssh-mcp-server&type=date&legend=top-left)](https://www.star-history.com/#classfang/ssh-mcp-server&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=Xiyueyy/ssh-mcp&type=date&legend=top-left)](https://www.star-history.com/#Xiyueyy/ssh-mcp&type=date&legend=top-left)
+
+## AstrBot 绠＄悊鍛橀壌鏉?
+杩欎釜鍒嗘敮缁欏叏閮?MCP 宸ュ叿澧炲姞浜嗗彲閫夌殑 AstrBot 绠＄悊鍛樻牎楠岋細
+
+- `execute-command`
+- `upload`
+- `download`
+- `list-servers`
+
+鍚敤鍚庯紝姣忔宸ュ叿璋冪敤閮介渶瑕佷紶鍏?`operatorId`銆傛湇鍔＄浼氳鍙?AstrBot 鐨?`cmd_config.json` 涓殑 `admins_id`锛屽彧鏈夊懡涓殑鐢ㄦ埛鎵嶈兘鎵ц宸ュ叿銆?
+### 鏂板鍛戒护琛屽弬鏁?
+```text
+--require-astrbot-admin   鍚敤 AstrBot 绠＄悊鍛樻牎楠?--admin-ids               鐩存帴濉啓绠＄悊鍛?ID锛岄€楀彿鍒嗛殧锛屼緥濡?10001,10002
+--astrbot-config-file     AstrBot data/config/cmd_config.json 璺緞
+```
+
+濡傛灉鍚屾椂閰嶇疆浜?`--admin-ids` 鍜?`--astrbot-config-file`锛屼細浼樺厛浣跨敤 `--admin-ids`銆?
+### 鏀寔鐨勭幆澧冨彉閲?
+```text
+SSH_MCP_REQUIRE_ASTRBOT_ADMIN=1
+SSH_MCP_ADMIN_IDS=10001,10002
+SSH_MCP_ASTRBOT_CONFIG_PATH=/path/to/AstrBot/data/config/cmd_config.json
+
+# 鍏煎鍒悕
+REQUIRE_ASTRBOT_ADMIN=1
+ADMIN_IDS=10001,10002
+ASTRBOT_CONFIG_PATH=/path/to/AstrBot/data/config/cmd_config.json
+ASTRBOT_ROOT=/path/to/AstrBot
+```
+
+### AstrBot MCP 閰嶇疆绀轰緥
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "node",
+      "args": [
+        "/path/to/ssh-mcp-server/build/index.js",
+        "--config-file",
+        "/path/to/ssh-config.json",
+        "--require-astrbot-admin",
+        "--astrbot-config-file",
+        "/path/to/AstrBot/data/config/cmd_config.json"
+      ]
+    }
+  }
+}
+```
+
+### 宸ュ叿璋冪敤绀轰緥
+
+```json
+{
+  "tool": "execute-command",
+  "params": {
+    "cmdString": "ls -al",
+    "connectionName": "prod",
+    "operatorId": "1738068535"
+  }
+}
+```
+
+### 涓嶈鍙?AstrBot 閰嶇疆鐨勬洿绠€鍗曞啓娉?
+濡傛灉浣犲凡缁忕煡閬撳摢浜?sender_id 鏄鐞嗗憳锛屽彲浠ョ洿鎺ュ啓姝诲湪 MCP 閰嶇疆閲岋紝涓嶉渶瑕佸啀璇诲彇 `cmd_config.json`锛?
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@xiyueyy/ssh-mcp",
+        "--host",
+        "103.117.136.155",
+        "--port",
+        "22",
+        "--username",
+        "root",
+        "--password",
+        "your-password",
+        "--require-astrbot-admin",
+        "--admin-ids",
+        "1738068535,2653839788"
+      ]
+    }
+  }
+}
+```
+
+### 闇€瑕佹敞鎰忕殑闄愬埗
+
+AstrBot 褰撳墠鐨勫師鐢?MCP 鎺ュ叆涓嶄細鑷姩鎶娾€滃綋鍓嶅彂娑堟伅鐨勪汉鈥濈殑 ID 浼犵粰 stdio MCP 鏈嶅姟銆傛墍浠ヨ繖鐗堣櫧鐒惰兘璇诲彇 AstrBot 鐨勭鐞嗗憳閰嶇疆锛屼絾浠嶇劧闇€瑕佽皟鐢ㄦ柟鏄惧紡浼犲叆 `operatorId`锛屾墠鑳藉畬鎴愮鐞嗗憳鏍￠獙銆?

@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SSHConnectionManager } from "../services/ssh-connection-manager.js";
 import { Logger } from "../utils/logger.js";
+import { ensureAstrBotAdmin, operatorIdSchema } from "./auth.js";
 
 /**
  * Register file upload tool
@@ -17,10 +18,12 @@ export function registerUploadTool(server: McpServer): void {
         localPath: z.string().describe("Local path"),
         remotePath: z.string().describe("Remote path"),
         connectionName: z.string().optional().describe("SSH connection name (optional, default is 'default')"),
+        operatorId: operatorIdSchema,
       },
     },
-    async ({ localPath, remotePath, connectionName }) => {
+    async ({ localPath, remotePath, connectionName, operatorId }) => {
       try {
+        ensureAstrBotAdmin(operatorId);
         const result = await sshManager.upload(localPath, remotePath, connectionName);
         return {
           content: [{ type: "text", text: result }],

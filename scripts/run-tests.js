@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
-/**
- * 测试运行器
- * 使用 Node.js 内置的测试框架运行所有测试
- */
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { execSync } from 'child_process';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, "..");
 
-console.log('🧪 运行测试...\n');
+console.log("Running tests...\n");
 
-try {
-  execSync('node --test test/**/*.test.js', {
-    stdio: 'inherit',
-    cwd: new URL('..', import.meta.url).pathname
-  });
-} catch (err) {
-  process.exit(1);
+const result = spawnSync(process.execPath, ["--test", "test/**/*.test.js"], {
+  cwd: repoRoot,
+  stdio: "inherit",
+});
+
+if (result.status !== 0) {
+  process.exit(result.status ?? 1);
 }

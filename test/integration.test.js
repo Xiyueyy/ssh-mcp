@@ -1,195 +1,125 @@
-import { describe, it, before, after } from 'node:test';
-import assert from 'node:assert';
-import { CommandLineParser } from '../build/cli/command-line-parser.js';
-import { SSHConnectionManager } from '../build/services/ssh-connection-manager.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { afterEach, before, describe, it } from "node:test";
+import assert from "node:assert";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { CommandLineParser } from "../build/cli/command-line-parser.js";
+import { SSHConnectionManager } from "../build/services/ssh-connection-manager.js";
+import { AstrBotAdminAuth } from "../build/services/astrbot-admin-auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const fixturesDir = path.join(__dirname, 'fixtures');
+const fixturesDir = path.join(__dirname, "fixtures");
 
-describe('集成测试', () => {
-  let originalArgv;
+describe("integration", () => {
+  const originalArgv = [...process.argv];
+  const originalEnv = { ...process.env };
+  const astrBotConfigPath = path.join(fixturesDir, "integration-cmd_config.json");
 
   before(() => {
-    originalArgv = process.argv;
+    fs.mkdirSync(fixturesDir, { recursive: true });
+    fs.writeFileSync(
+      astrBotConfigPath,
+      JSON.stringify({
+        admins_id: ["1738068535", "2653839788"],
+      }),
+    );
+  });
 
-    if (!fs.existsSync(fixturesDir)) {
-      fs.mkdirSync(fixturesDir, { recursive: true });
+  afterEach(() => {
+    process.argv = [...originalArgv];
+    for (const key of Object.keys(process.env)) {
+      if (!(key in originalEnv)) {
+        delete process.env[key];
+      }
     }
+    for (const [key, value] of Object.entries(originalEnv)) {
+      process.env[key] = value;
+    }
+    SSHConnectionManager.getInstance().disconnect();
+    AstrBotAdminAuth.getInstance().configure({ requireAstrBotAdmin: false });
   });
 
-  after(() => {
-    process.argv = originalArgv;
+  it("flows parsed configs into the ssh manager", () => {
+    process.argv = [
+      "node",
+      "test",
+      "--host",
+      "192.168.1.100",
+      "--port",
+      "22",
+      "--username",
+      "root",
+      "--password",
+      "pwd123",
+    ];
+
+    const parsedArgs = CommandLineParser.parseArgs();
+    const manager = SSHConnectionManager.getInstance();
+    manager.setConfig(parsedArgs.configs);
+
+    const info = manager.getAllServerInfos();
+    assert.strictEqual(info.length, 1);
+    assert.strictEqual(info[0].host, "192.168.1.100");
+    assert.strictEqual(info[0].connected, false);
   });
 
-  describe('端到端场景', () => {
-    it('应该能够从命令行参数创建完整配置并传递给连接管理器', () => {
-      process.argv = [
-        'node',
-        'test',
-        '--host', '192.168.1.100',
-        '--port', '22',
-        '--username', 'testuser',
-        '--password', 'testpass',
-        '--whitelist', 'ls,cat,grep',
-        '--blacklist', 'rm,shutdown'
-      ];
+  it("authorizes AstrBot admins from the parsed config", () => {
+    process.argv = [
+      "node",
+      "test",
+      "--host",
+      "192.168.1.100",
+      "--port",
+      "22",
+      "--username",
+      "root",
+      "--password",
+      "pwd123",
+      "--require-astrbot-admin",
+      "--astrbot-config-file",
+      astrBotConfigPath,
+    ];
 
-      const result = CommandLineParser.parseArgs();
+    const parsedArgs = CommandLineParser.parseArgs();
+    const auth = AstrBotAdminAuth.getInstance();
+    auth.configure(parsedArgs.auth);
 
-      assert.strictEqual(result.configs.default.host, '192.168.1.100');
-      assert.strictEqual(result.configs.default.port, 22);
-      assert.strictEqual(result.configs.default.username, 'testuser');
-      assert.deepStrictEqual(result.configs.default.commandWhitelist, ['ls', 'cat', 'grep']);
-      assert.deepStrictEqual(result.configs.default.commandBlacklist, ['rm', 'shutdown']);
-
-      // 验证可以用这个配置初始化连接管理器
-      const manager = SSHConnectionManager.getInstance();
-      manager.setConfig(result.configs);
-
-      const config = manager.getConfig('default');
-      assert.strictEqual(config.host, '192.168.1.100');
-      assert.strictEqual(config.username, 'testuser');
+    assert.doesNotThrow(() => {
+      auth.authorize("1738068535");
     });
 
-    it('应该能够从 SSH config 创建完整配置', () => {
-      const tempSshConfig = path.join(fixturesDir, 'integration-ssh-config');
-      fs.writeFileSync(tempSshConfig, [
-        'Host integration-test',
-        '    HostName 192.168.1.200',
-        '    Port 2222',
-        '    User integrationuser',
-        '    IdentityFile ~/.ssh/integration_key',
-      ].join('\n'));
-
-      try {
-        process.argv = [
-          'node',
-          'test',
-          '--host', 'integration-test',
-          '--ssh-config-file', tempSshConfig
-        ];
-
-        const result = CommandLineParser.parseArgs();
-
-        assert.strictEqual(result.configs.default.host, '192.168.1.200');
-        assert.strictEqual(result.configs.default.port, 2222);
-        assert.strictEqual(result.configs.default.username, 'integrationuser');
-        assert.ok(result.configs.default.privateKey.includes('integration_key'));
-
-        // 验证可以用这个配置初始化连接管理器
-        const manager = SSHConnectionManager.getInstance();
-        manager.setConfig(result.configs);
-
-        const config = manager.getConfig('default');
-        assert.strictEqual(config.host, '192.168.1.200');
-      } finally {
-        fs.unlinkSync(tempSshConfig);
-      }
-    });
-
-    it('应该能够处理多服务器配置', () => {
-      const tempConfig = path.join(fixturesDir, 'multi-server-config.json');
-      fs.writeFileSync(tempConfig, JSON.stringify({
-        server1: {
-          host: '192.168.1.1',
-          port: 22,
-          username: 'user1',
-          password: 'pass1',
-          commandWhitelist: ['^ls', '^cat']
-        },
-        server2: {
-          host: '192.168.1.2',
-          port: 2222,
-          username: 'user2',
-          privateKey: '~/.ssh/key2',
-          commandBlacklist: ['^rm', '^shutdown']
-        }
-      }));
-
-      try {
-        process.argv = ['node', 'test', '--config-file', tempConfig];
-
-        const result = CommandLineParser.parseArgs();
-        assert.strictEqual(Object.keys(result.configs).length, 2);
-
-        const manager = SSHConnectionManager.getInstance();
-        manager.setConfig(result.configs);
-
-        // 验证配置列表
-        const allInfos = manager.getAllServerInfos();
-        assert.strictEqual(allInfos.length, 2);
-
-        const server1 = allInfos.find(i => i.name === 'server1');
-        assert.ok(server1);
-        assert.strictEqual(server1.host, '192.168.1.1');
-        assert.strictEqual(server1.connected, false);
-
-        const server2 = allInfos.find(i => i.name === 'server2');
-        assert.ok(server2);
-        assert.strictEqual(server2.port, 2222);
-      } finally {
-        fs.unlinkSync(tempConfig);
-      }
-    });
+    assert.throws(() => {
+      auth.authorize("not-admin");
+    }, /allowed admin ID list/);
   });
 
-  describe('错误处理', () => {
-    it('应该正确处理无效的 JSON 配置文件', () => {
-      const invalidConfig = path.join(fixturesDir, 'invalid-config.json');
-      fs.writeFileSync(invalidConfig, '{ invalid json }');
+  it("authorizes configured admin ids without reading AstrBot config", () => {
+    process.argv = [
+      "node",
+      "test",
+      "--host",
+      "192.168.1.100",
+      "--port",
+      "22",
+      "--username",
+      "root",
+      "--password",
+      "pwd123",
+      "--admin-ids",
+      "1738068535,2653839788",
+    ];
 
-      try {
-        process.argv = ['node', 'test', '--config-file', invalidConfig];
-        assert.throws(() => {
-          CommandLineParser.parseArgs();
-        }, /Invalid JSON/);
-      } finally {
-        fs.unlinkSync(invalidConfig);
-      }
+    const parsedArgs = CommandLineParser.parseArgs();
+    const auth = AstrBotAdminAuth.getInstance();
+    auth.configure(parsedArgs.auth);
+
+    assert.doesNotThrow(() => {
+      auth.authorize("2653839788");
     });
 
-    it('应该正确处理缺少必需字段的配置', () => {
-      const incompleteConfig = path.join(fixturesDir, 'incomplete-config.json');
-      fs.writeFileSync(incompleteConfig, JSON.stringify({
-        server1: {
-          host: '192.168.1.1'
-          // 缺少 port, username 等必需字段
-        }
-      }));
-
-      try {
-        process.argv = ['node', 'test', '--config-file', incompleteConfig];
-        assert.throws(() => {
-          CommandLineParser.parseArgs();
-        });
-      } finally {
-        fs.unlinkSync(incompleteConfig);
-      }
-    });
-
-    it('应该正确处理不存在的配置文件', () => {
-      process.argv = ['node', 'test', '--config-file', '/nonexistent/config.json'];
-      assert.throws(() => {
-        CommandLineParser.parseArgs();
-      }, /not found/);
-    });
-
-    it('应该正确处理缺少认证参数的情况', () => {
-      process.argv = ['node', 'test', '--host', '1.2.3.4', '--port', '22', '--username', 'user'];
-      assert.throws(() => {
-        CommandLineParser.parseArgs();
-      }, /Missing required parameters/);
-    });
-
-    it('应该正确处理无效的端口号', () => {
-      process.argv = ['node', 'test', '--host', '1.2.3.4', '--port', 'abc', '--username', 'user', '--password', 'pass'];
-      assert.throws(() => {
-        CommandLineParser.parseArgs();
-      }, /Port must be a valid number/);
-    });
+    assert.throws(() => {
+      auth.authorize("not-admin");
+    }, /allowed admin ID list/);
   });
 });

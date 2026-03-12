@@ -1,11 +1,11 @@
 {
-  "name": "@fangjunjie/ssh-mcp-server",
-  "version": "1.3.0",
+  "name": "@xiyueyy/ssh-mcp",
+  "version": "1.3.1",
   "description": "SSH-based MCP Server (基于 SSH 的 MCP 服务器)",
   "main": "build/index.js",
   "type": "module",
   "bin": {
-    "ssh-mcp-server": "build/index.js"
+    "ssh-mcp": "build/index.js"
   },
   "scripts": {
     "test": "node scripts/run-tests.js",
@@ -19,8 +19,16 @@
     "server",
     "cli"
   ],
-  "author": "Junki",
+  "author": "Xiyueyy",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xiyueyy/ssh-mcp.git"
+  },
+  "homepage": "https://github.com/Xiyueyy/ssh-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/Xiyueyy/ssh-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.0",
     "socks": "^2.8.7",

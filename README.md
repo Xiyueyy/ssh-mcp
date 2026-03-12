@@ -518,6 +518,41 @@ directly and skip `cmd_config.json` entirely:
 }
 ```
 
+### Use GitHub directly without npm publish
+
+You can also run this fork straight from GitHub:
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:Xiyueyy/ssh-mcp",
+        "--host",
+        "103.117.136.155",
+        "--port",
+        "22",
+        "--username",
+        "root",
+        "--password",
+        "your-password",
+        "--require-astrbot-admin",
+        "--admin-ids",
+        "1738068535,2653839788"
+      ]
+    }
+  }
+}
+```
+
+Notes:
+
+- This repository now uses a `prepare` script, so GitHub installs build automatically.
+- The server machine still needs `git`, `node`, and `npm`.
+- For stability, pin a tag or commit when you are done testing.
+
 ### Important limitation
 
 AstrBot's native MCP integration does not automatically pass the current sender/admin ID into a stdio MCP server. Because of that, this fork can enforce AstrBot's admin list only when the caller explicitly passes `operatorId`.

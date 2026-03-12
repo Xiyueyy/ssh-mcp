@@ -509,6 +509,41 @@ ASTRBOT_ROOT=/path/to/AstrBot
 }
 ```
 
+### 直接从 GitHub 使用
+
+如果你不想发 npm，也可以直接在 AstrBot 的 MCP 配置里写 GitHub 仓库：
+
+```json
+{
+  "mcpServers": {
+    "ssh-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:Xiyueyy/ssh-mcp",
+        "--host",
+        "103.117.136.155",
+        "--port",
+        "22",
+        "--username",
+        "root",
+        "--password",
+        "your-password",
+        "--require-astrbot-admin",
+        "--admin-ids",
+        "1738068535,2653839788"
+      ]
+    }
+  }
+}
+```
+
+说明：
+
+- 仓库里已经加了 `prepare`，从 GitHub 安装时会自动构建。
+- 服务器上仍然需要有 `git`、`node`、`npm`。
+- 真正稳定后，建议固定 tag 或 commit，而不是一直跟默认分支。
+
 ### 闇€瑕佹敞鎰忕殑闄愬埗
 
 AstrBot 褰撳墠鐨勫師鐢?MCP 鎺ュ叆涓嶄細鑷姩鎶娾€滃綋鍓嶅彂娑堟伅鐨勪汉鈥濈殑 ID 浼犵粰 stdio MCP 鏈嶅姟銆傛墍浠ヨ繖鐗堣櫧鐒惰兘璇诲彇 AstrBot 鐨勭鐞嗗憳閰嶇疆锛屼絾浠嶇劧闇€瑕佽皟鐢ㄦ柟鏄惧紡浼犲叆 `operatorId`锛屾墠鑳藉畬鎴愮鐞嗗憳鏍￠獙銆?
